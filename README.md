@@ -26,7 +26,7 @@ The control interface includes robot motion commands as well as IO control for g
 
 ## 🛠️ Prerequisites
 
-- ROS 2 installed (tested on ROS 2 Foxy/Humble)
+- ROS 2 installed (tested on ROS 2 Foxy)
 - TM Robot SDK / `tm_msgs` package installed
 - TM Robot hardware with IP (example: `192.168.11.2`)
 - Ngrok (for remote tunnel)
