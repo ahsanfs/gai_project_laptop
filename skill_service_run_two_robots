@@ -1,0 +1,111 @@
+import rclpy
+from rclpy.node import Node
+from tm_msgs.srv import SetIO, SetPosition
+from std_srvs.srv import Trigger
+from example_interfaces.srv import SetBool
+
+
+class RobotController:
+    def __init__(self, node, robot_name):
+        self.node = node
+        self.robot_name = robot_name
+
+        # Service clients specific to this robot
+        self.set_io_client = node.create_client(SetIO, f'{robot_name}/set_io')
+        self.set_position_client = node.create_client(SetPosition, f'{robot_name}/set_position')
+        self.control_gripper_client = node.create_client(SetBool, f'{robot_name}/control_gripper')
+        self.move_home_client = node.create_client(Trigger, f'{robot_name}/move_home')
+
+    def set_io(self, module, io_type, pin, state):
+        if not self.set_io_client.wait_for_service(timeout_sec=1.0):
+            self.node.get_logger().error(f"Service {self.robot_name}/set_io not available.")
+            return False
+        req = SetIO.Request()
+        req.module = module
+        req.type = io_type
+        req.pin = pin
+        req.state = state
+        self.set_io_client.call_async(req)
+
+    def set_position(self, motion_type, pose, velocity, acc_time, blend_percentage, fine_goal):
+        if not self.set_position_client.wait_for_service(timeout_sec=1.0):
+            self.node.get_logger().error(f"Service {self.robot_name}/set_position not available.")
+            return False
+        req = SetPosition.Request()
+        req.motion_type = motion_type
+        req.pose = pose
+        req.velocity = velocity
+        req.acc_time = acc_time
+        req.blend_percentage = blend_percentage
+        req.fine_goal = fine_goal
+        self.set_position_client.call_async(req)
+
+    def control_gripper(self, state):
+        if not self.control_gripper_client.wait_for_service(timeout_sec=1.0):
+            self.node.get_logger().error(f"Service {self.robot_name}/control_gripper not available.")
+            return False
+        req = SetBool.Request()
+        req.data = state
+        self.control_gripper_client.call_async(req)
+
+    def move_home(self):
+        if not self.move_home_client.wait_for_service(timeout_sec=1.0):
+            self.node.get_logger().error(f"Service {self.robot_name}/move_home not available.")
+            return False
+        req = Trigger.Request()
+        self.move_home_client.call_async(req)
+
+
+class MultiRobotControl(Node):
+    def __init__(self):
+        super().__init__('multi_robot_control')
+
+        # Initialize controllers for each robot
+        self.robot1 = RobotController(self, 'robot1')
+        self.robot2 = RobotController(self, 'robot2')
+
+        self.get_logger().info('MultiRobotControl Node Initialized.')
+
+    def execute_robot_tasks(self):
+        # Example tasks for Robot 1
+        self.robot1.set_io(module=1, io_type=1, pin=0, state=1.0)
+        self.robot1.set_position(
+            motion_type=1,
+            pose=[0.5, 0.0, 0.2, 0.0, 0.0, 0.0],
+            velocity=1.0,
+            acc_time=0.2,
+            blend_percentage=0,
+            fine_goal=True
+        )
+        self.robot1.control_gripper(state=True)
+        self.robot1.move_home()
+
+        # Example tasks for Robot 2
+        self.robot2.set_io(module=1, io_type=1, pin=0, state=0.0)
+        self.robot2.set_position(
+            motion_type=1,
+            pose=[0.6, 0.0, 0.2, 0.0, 0.0, 0.0],
+            velocity=1.0,
+            acc_time=0.2,
+            blend_percentage=0,
+            fine_goal=True
+        )
+        self.robot2.control_gripper(state=False)
+        self.robot2.move_home()
+
+
+def main(args=None):
+    rclpy.init(args=args)
+    multi_robot_control = MultiRobotControl()
+
+    try:
+        multi_robot_control.execute_robot_tasks()
+        rclpy.spin(multi_robot_control)
+    except KeyboardInterrupt:
+        multi_robot_control.get_logger().info('Shutting down MultiRobotControl Node.')
+    finally:
+        rclpy.shutdown()
+
+
+if __name__ == '__main__':
+    main()
