@@ -54,6 +54,7 @@ class ARM1_Skills(Node):
             self.degrees_to_radians(ry),
             self.degrees_to_radians(rz),
         ]
+        print(req.positions)
         req.velocity = velocity
         req.acc_time = acc_time
         req.blend_percentage = blend_percentage
@@ -125,7 +126,6 @@ class ARM1_Skills(Node):
             rx=161.02, ry=-0.43, rz=175.62,
             velocity=velocity
         )
-        print(f"ARM 1 moving to {328, 57, 171}")
         self.get_logger().info('Moving to home position.')
 
     def insert(self, x, y, z, rx, ry, rz, velocity=0.5):

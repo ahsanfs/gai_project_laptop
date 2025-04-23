@@ -46,89 +46,43 @@ def main(subtasks, coords, begin=False):
     """
     rclpy.init()
     arm1 = ARM1_Skills()
-    # arm2 = ARM2_Skills()
 
     if begin == True:
         arm1.arm1_home() # Set gripper to home position
-    # arm2.arm2_home() # Set screwdriver to home position
 
     for t, task in enumerate(subtasks):
         x, y, z = coords[t]
         if task == 'pickup':
             tolerance = 0.0001
-            # arm1.move_to(x, y , z,  173.33, 0.16, 93.13, velocity=1.0) # Move to grasping position
-            # arm1.move_to(x, y, z + 200,  180.0, 0, 90, velocity=1.0)            arm1.move_to(410.49, y, z,  -118.21, -0.61, -90.91, velocity=1.0) # Move to grasping position
-            
-            
-            
-            arm1.move_to(208.19, 370.11, 91.36,  -118.21, -0.61, -90.91, velocity=1.7) # Move to grasping position
-            
-                        
-            
-            arm1.move_to(208.19, 370.11, -2.45,  -118.21, -0.61, -90.91, velocity=0.8) # Move to grasping position
-            
-            
-            arm1.move_to(x, y, z,  -118.21, -0.61, -90.91, velocity=0.2) # Move to grasping position
-            
+            arm1.move_to(208.19, 370.11, 91.36,  -118.21, -0.61, -90.91, velocity=1.7)
+            arm1.move_to(208.19, 370.11, -2.45,  -118.21, -0.61, -90.91, velocity=0.8)
+            arm1.move_to(x, y, z,  -118.21, -0.61, -90.91, velocity=0.2)
 
             while rclpy.ok():
-                rclpy.spin_once(arm1)  # Process callback queue
-                # Lock the screw 
+                rclpy.spin_once(arm1)
                 if arm1.tool_pose and arm1.is_pose_ready(arm1.tool_pose, [x / 1000, y / 1000, z / 1000], tolerance):
                     arm1.get_logger().info("Tool pose reached target position. Gripping.")
-                    if arm1.gripper():  # Run the screwdriver task and wait for it to complete
+                    if arm1.gripper():  # Gripping object
                         time.sleep(3)
-                        arm1.move_to(208.19, 370.11, 21.59,  -118.21, -0.61, -90.91, velocity=1.0) # Move to grasping position
-            
-                        # arm1.arm1_home()
-                        # status = True
+                        arm1.move_to(208.19, 370.11, 21.59,  -118.21, -0.61, -90.91, velocity=1.0)
                     else:
-                    #     # arm2.move_to(x, y, z+0.1, -178.91, -2.69, -87.03, velocity=4.0 )
-                    #     arm1.get_logger().info("Gripping task finish. Moving to the next position.")
-                    #     # arm2.arm2_home()
-                    # else:
                         arm1.get_logger().error("Gripping task failed. Halting further operations.")
                     break
-                    # if status == True:
-                    #     break
-                
-
-
-            # arm1.pick_up() # Grasp and then lift off of buffer??
-            # arm1.grip()
 
         elif task == 'putdown':
             tolerance = 0.0001
-            # arm1.move_to(167.51/1000, 244.41/1000, (28.80/1000) + 0.03, 180.0, 0, -180, velocity=1.5) # Move to putting position
-            # arm1.move_to(167.51/1000, 244.41/1000, (28.80/1000) + 0.01, 180.0, 0, -180, velocity=1.0) # Move to putting position
-            # arm1.move_to(x, y, z, 180.0, 0, -180, velocity=0.5) # Move to putting position
+            arm1.move_to(410.49, 405.22, 21.59,  -118.21, -0.61, -90.91, velocity=1.2)
+            arm1.move_to(x, y, z,  -118.21, -0.61, -90.91, velocity=0.3)
 
-
-            arm1.move_to(410.49, 405.22, 21.59,  -118.21, -0.61, -90.91, velocity=1.2) # Move to grasping position
-            
-            arm1.move_to(x, y, z,  -118.21, -0.61, -90.91, velocity=0.3) # Move to grasping position
-            
-            # arm1.put_down()
-            # arm1.release()
             while rclpy.ok():
-                rclpy.spin_once(arm1)  # Process callback queue
-                # Lock the screw 
+                rclpy.spin_once(arm1)
                 if arm1.tool_pose and arm1.is_pose_ready(arm1.tool_pose, [x / 1000, y / 1000, z / 1000], tolerance):
                     arm1.get_logger().info("Tool pose reached target position. Gripping.")
-                    if arm1.gripper():  # Run the screwdriver task and wait for it to complete
+                    if arm1.gripper(): # Gripping object
                         time.sleep(3)
-                        # arm1.arm1_home()
-                        # status = True
                     else:
-                    #     # arm2.move_to(x, y, z+0.1, -178.91, -2.69, -87.03, velocity=4.0 )
-                    #     arm1.get_logger().info("Gripping task finish. Moving to the next position.")
-                    #     # arm2.arm2_home()
-                    # else:
                         arm1.get_logger().error("Gripping task failed. Halting further operations.")
                     break
-        
-        # elif taslk == 'gripper':
-        #     arm1.gripper()
 
         elif task == 'insert':
             arm1.move_to(x, y-0.1, z, 173.33, 0.16, 93.13, velocity=1.0)
@@ -136,10 +90,7 @@ def main(subtasks, coords, begin=False):
             arm1.arm1_home()
         
         elif task == 'home':
-            # arm1.move_to(x, y-0.1, z, 173.33, 0.16, 93.13, velocity=1.0)
-            # arm1.insert(x, y, z, 166.37, 2.67, 177.51, velocity=0.5)
-            # arm1.arm1_home()
-            print("you are there")
+            # print("Good")
             arm1.gripper()
 
         elif task == 'lock':

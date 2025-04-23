@@ -34,38 +34,24 @@ The control interface includes robot motion commands as well as IO control for g
 ---
 
 ## 🚀 Command Line Examples
+Notes: TM robot works in degrees, but since ROS normally work in Radians, so we need to convert the degrees to radians first. Also, TM robot works in meters.
+
+    def degrees_to_radians(self, degrees):
+        """Convert degrees to radians."""
+        return degrees * (math.pi / 180)
+
+    def milimeters_to_meters(self, units):
+        return units / 1000
+
 
 ### ✅ Move Robot to Position
 ```bash
-ros2 service call /move_to_position tm_msgs/srv/SetPosition "{
-  motion_type: 1,
-  pose: {x: 0.5, y: 0.0, z: 0.2, r: 0.0, p: 0.0, yw: 0.0},
-  velocity: 1.0,
-  acc_time: 0.2,
-  blend_percentage: 0,
-  fine_goal: true
-}"
+ros2 service call /arm1/set_positions tm_msgs/srv/SetPositions "{motion_type: 4, positions: [0.126893, 0.20437, 0.30512, 2.8103291615612696, -0.007504915783575617, 3.065147232352442], velocity: 0.5, acc_time: 0.5, blend_percentage: 0, fine_goal: true}"
 ```
 
-
-✅ Gripper ON
+✅ Gripper
 ```bash
-ros2 service call /set_io tm_msgs/srv/SetIO "{
-  module: 1,
-  type: 1,
-  pin: 0,
-  state: 1
-}"
-```
-
-✅ Gripper OFF
-```bash
-ros2 service call /set_io tm_msgs/srv/SetIO "{
-  module: 1,
-  type: 1,
-  pin: 0,
-  state: 0
-}"
+ros2 service call /arm1/send_script tm_msgs/srv/SendScript "{id: 'Hucenrotia', script: 'ScriptExit()'}"
 ```
 
 ## 🧪 How to run the full system
@@ -93,6 +79,15 @@ source ~/gai_ws/devel/setup.bash
 python3 laptop_ngrok_controller.py
 ```
 This Python script connects to ngrok and sends control commands to the arm via ROS services.
+
+Terminal 4 – Run the Initial Movement
+```bash
+cd ~/gai_ws/src/tmr_ros2/scripts/script/
+source ~/gai_ws/devel/setup.bash
+python3 robot1_init.py
+```
+This Python script ...
+
 
 ## 📌 Notes
 1. Make sure your TM Robot is on the same network as your ROS 2 PC.
